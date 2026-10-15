@@ -247,12 +247,12 @@
     "vscode:prepublish": "npm run compile"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.4",
-    "@types/node": "18.19.130",
-    "@types/vscode": "1.85.0",
-    "@vscode/test-electron": "2.5.2",
-    "eslint": "9.39.4",
-    "typescript": "5.9.3",
-    "typescript-eslint": "8.46.2"
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.5",
+    "@types/vscode": "1.140.0",
+    "@vscode/test-electron": "3.1.0",
+    "eslint": "10.12.0",
+    "typescript": "7.0.2",
+    "typescript-eslint": "8.71.1"
   }
 }
