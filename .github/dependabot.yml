@@ -7,6 +7,15 @@ updates:
     groups:
       dev-dependencies:
         patterns: ["*"]
+    ignore:
+      # @types/vscode must match the lowest VS Code in package.json's engines
+      # field, or vsce refuses to package; raise both together by hand.
+      - dependency-name: "@types/vscode"
+      # Matches the Node.js inside the oldest supported VS Code.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
