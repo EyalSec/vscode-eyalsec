@@ -1,0 +1,258 @@
+{
+  "name": "vscode-eyalsec",
+  "displayName": "EyalSec",
+  "description": "See your EyalSec events in VS Code: where untrusted data came in, the operation it reached, and a jump to the line in your workspace.",
+  "version": "0.1.0",
+  "publisher": "eyalsec",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "homepage": "https://eyalsec.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EyalSec/vscode-eyalsec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EyalSec/vscode-eyalsec/issues"
+  },
+  "galleryBanner": {
+    "color": "#0b0b0d",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Testing",
+    "Other"
+  ],
+  "keywords": [
+    "security",
+    "taint tracking",
+    "appsec",
+    "eyalsec",
+    "vulnerabilities"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": {
+      "supported": "limited",
+      "description": "Opening an event's file needs files on disk; the event list itself works anywhere."
+    }
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "eyalsec",
+          "title": "EyalSec",
+          "icon": "media/activitybar.svg"
+        }
+      ]
+    },
+    "views": {
+      "eyalsec": [
+        {
+          "id": "eyalsec.events",
+          "name": "Events",
+          "icon": "media/activitybar.svg",
+          "contextualTitle": "EyalSec"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "eyalsec.events",
+        "contents": "Add your EyalSec API key to see your events here. A read-only key is all this extension needs.\n[Set API key](command:eyalsec.setApiKey)\nCreate a key on your dashboard under Settings > API access. [Read about API keys](https://eyalsec.com/docs/api-keys)",
+        "when": "!eyalsec.hasApiKey"
+      }
+    ],
+    "commands": [
+      {
+        "command": "eyalsec.setApiKey",
+        "title": "Set API Key",
+        "category": "EyalSec",
+        "icon": "$(key)"
+      },
+      {
+        "command": "eyalsec.clearApiKey",
+        "title": "Remove API Key",
+        "category": "EyalSec"
+      },
+      {
+        "command": "eyalsec.refresh",
+        "title": "Refresh Events",
+        "category": "EyalSec",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "eyalsec.openEventsPage",
+        "title": "Open Events Page in Browser",
+        "category": "EyalSec",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "eyalsec.openLocation",
+        "title": "Go to Line",
+        "category": "EyalSec"
+      },
+      {
+        "command": "eyalsec.loadMore",
+        "title": "Load More Events",
+        "category": "EyalSec"
+      },
+      {
+        "command": "eyalsec.copyText",
+        "title": "Copy",
+        "category": "EyalSec"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "eyalsec.refresh",
+          "when": "view == eyalsec.events",
+          "group": "navigation@1"
+        },
+        {
+          "command": "eyalsec.openEventsPage",
+          "when": "view == eyalsec.events",
+          "group": "navigation@2"
+        },
+        {
+          "command": "eyalsec.setApiKey",
+          "when": "view == eyalsec.events",
+          "group": "1_key@1"
+        },
+        {
+          "command": "eyalsec.clearApiKey",
+          "when": "view == eyalsec.events && eyalsec.hasApiKey",
+          "group": "1_key@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "eyalsec.copyText",
+          "when": "view == eyalsec.events && viewItem =~ /copyable/",
+          "group": "1_copy"
+        },
+        {
+          "command": "eyalsec.openEventsPage",
+          "when": "view == eyalsec.events && viewItem =~ /product/",
+          "group": "2_open"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "eyalsec.openLocation",
+          "when": "false"
+        },
+        {
+          "command": "eyalsec.loadMore",
+          "when": "false"
+        },
+        {
+          "command": "eyalsec.copyText",
+          "when": "false"
+        },
+        {
+          "command": "eyalsec.clearApiKey",
+          "when": "eyalsec.hasApiKey"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "EyalSec",
+      "properties": {
+        "eyalsec.url": {
+          "type": "string",
+          "default": "https://eyalsec.com",
+          "scope": "application",
+          "markdownDescription": "Your EyalSec address. Leave it as `https://eyalsec.com` unless your account lives on another domain. Must be `https://` (plain `http://` is accepted for `localhost` only). The API key is stored per address, so changing this asks for the key of the new address."
+        },
+        "eyalsec.sort": {
+          "type": "string",
+          "enum": [
+            "severity",
+            "newest"
+          ],
+          "enumDescriptions": [
+            "Most severe first, newest first within each severity.",
+            "Newest first."
+          ],
+          "default": "severity",
+          "description": "The order events are listed in."
+        },
+        "eyalsec.severity": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low",
+              "info"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [],
+          "description": "Show only these severities. Empty shows every severity."
+        },
+        "eyalsec.bucket": {
+          "type": "string",
+          "enum": [
+            "live",
+            "suppressed",
+            "all"
+          ],
+          "enumDescriptions": [
+            "Only events that were not suppressed (the dashboard's default).",
+            "Only suppressed events.",
+            "Both."
+          ],
+          "default": "live",
+          "description": "Which events to show, the same as the Show control on the events page."
+        },
+        "eyalsec.pageSize": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 500,
+          "description": "How many events to load per product at a time. Load More fetches the next batch."
+        },
+        "eyalsec.pathMappings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "markdownDescription": "Map a path prefix on the monitored machine to a folder here, for example `{ \"/srv/app\": \"${workspaceFolder}\" }`. Without a mapping, files are matched by the longest path ending that exists in your workspace."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src && tsc -p ./ --noEmit",
+    "test": "npm run compile && node --test out/test/unit/*.test.js",
+    "test:integration": "npm run compile && node ./out/test/integration/runTest.js",
+    "live-check": "npm run compile && node ./scripts/live-check.js",
+    "package": "npx --yes @vscode/vsce@3.9.2 package --no-dependencies",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.4",
+    "@types/node": "18.19.130",
+    "@types/vscode": "1.85.0",
+    "@vscode/test-electron": "2.5.2",
+    "eslint": "9.39.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.2"
+  }
+}
