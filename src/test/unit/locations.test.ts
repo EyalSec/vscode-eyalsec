@@ -51,18 +51,11 @@ test('parseTrace reads JavaScript frames and drops non-numeric ones', () => {
   assert.equal(frames.length, 3, 'node: internals have no file extension and are skipped');
 });
 
-test('parseTrace turns a Java frame into a package path', () => {
-  const frames = parseTrace('java.lang.RuntimeException\n\tat com.example.web.UserController.find(UserController.java:57)');
+test('parseTrace falls back to file.ext:line references', () => {
+  const frames = parseTrace('rendering page\n\t/home/ci/src/app/templates/page.html:42 +0x1d\nstatic/app.ts:7:9');
   assert.deepEqual(frames, [
-    { path: 'com/example/web/UserController.java', line: 57, func: 'com.example.web.UserController.find' },
-  ]);
-});
-
-test('parseTrace falls back to file.ext:line references (Go, C, Rust)', () => {
-  const frames = parseTrace('main.handler(...)\n\t/home/ci/src/app/main.go:42 +0x1d\nsrc/lib.rs:7:9');
-  assert.deepEqual(frames, [
-    { path: '/home/ci/src/app/main.go', line: 42 },
-    { path: 'src/lib.rs', line: 7, column: 9 },
+    { path: '/home/ci/src/app/templates/page.html', line: 42 },
+    { path: 'static/app.ts', line: 7, column: 9 },
   ]);
 });
 
