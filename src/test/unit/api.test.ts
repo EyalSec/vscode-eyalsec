@@ -184,7 +184,6 @@ test('parseRow reads by position and tolerates extra and missing values', () => 
 test('productName and severityRank', () => {
   assert.equal(productName('python'), 'es-python');
   assert.equal(productName('browser'), 'es-chromium');
-  assert.equal(productName('go'), 'es-go');
   assert.ok(severityRank('critical') < severityRank('info'));
   assert.equal(severityRank('nonsense'), 5);
 });

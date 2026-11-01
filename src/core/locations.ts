@@ -30,14 +30,13 @@ export function parseCodeHeader(code: string | undefined): CodeLocation | undefi
 }
 
 const PY_FRAME = /^\s*File "(.+?)", line (\d+)(?:, in (.+?))?\s*$/;
-const JAVA_FRAME = /^\s*at ([\w$.<>/]+?)\.([\w$<>]+)\(([\w$.-]+\.\w+):(\d+)\)\s*$/;
 const JS_FRAME = /^\s*at (?:(.+?) \()?((?:[a-z][\w+.-]*:\/\/)?[^\s()]+?):(\d+)(?::(\d+))?\)?\s*$/i;
 const GENERIC = /((?:[A-Za-z]:)?[\w.~@+\-/\\]*[\w-]\.[A-Za-z]\w{0,9}):(\d+)(?::(\d+))?/;
 
 /**
  * Pulls the frames out of a stack trace, outermost first, as the trace lists
- * them. Understands Python tracebacks, JavaScript and Java "at ..." lines, and
- * any other "file.ext:line" reference (Go, Rust, C and C++ traces).
+ * them. Understands Python tracebacks, JavaScript "at ..." lines, and any
+ * other "file.ext:line" reference.
  */
 export function parseTrace(trace: string | undefined, max = 200): CodeLocation[] {
   if (!trace) {
@@ -52,13 +51,6 @@ export function parseTrace(trace: string | undefined, max = 200): CodeLocation[]
     let m = PY_FRAME.exec(line);
     if (m) {
       out.push({ path: m[1], line: Number(m[2]), func: m[3] });
-      continue;
-    }
-    m = JAVA_FRAME.exec(line);
-    if (m) {
-      const cls = m[1];
-      const pkg = cls.includes('.') ? cls.slice(0, cls.lastIndexOf('.')).replace(/\./g, '/') + '/' : '';
-      out.push({ path: pkg + m[3], line: Number(m[4]), func: `${cls}.${m[2]}` });
       continue;
     }
     m = JS_FRAME.exec(line);

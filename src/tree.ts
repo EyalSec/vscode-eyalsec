@@ -23,7 +23,7 @@ interface ProductState {
 }
 
 /** The agent kinds in the order the dashboard lists them; others follow by name. */
-const PRODUCT_ORDER = ['python', 'browser', 'go', 'c', 'cpp', 'rust', 'node', 'solidity', 'java', 'bash', 'ruby', 'php'];
+const PRODUCT_ORDER = ['python', 'browser'];
 
 export interface ClientSource {
   client(): Promise<EyalSecClient | undefined>;
